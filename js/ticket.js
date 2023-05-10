@@ -1,51 +1,49 @@
 "use strict";
 
-document.addEventListener("DOMContentLoaded", () => {
+function generateTicket() {
+  const selectSeanse = JSON.parse(localStorage.selectSeanse);
+  console.log(selectSeanse);
 
-  const ticketDetails = getJSON("ticket-details");
+  let places = "";
+  let price = 0;
 
-  // Секция ticket__info-wrapper
-  const ticketInfoWrapper = document.querySelector(".ticket__info-wrapper");
-  ticketInfoWrapper.innerHTML = "";
-
-  const textHtml = `
-    <p class="ticket__info">На фильм: <span class="ticket__details ticket__title">${ticketDetails.filmName}</span></p>
-    <p class="ticket__info">Ряд/Место: <span class="ticket__details ticket__chairs">${ticketDetails.strRowPlace}</span></p>
-    <p class="ticket__info">В зале: <span class="ticket__details ticket__hall">${ticketDetails.hallNameNumber}</span></p>
-    <p class="ticket__info">Начало сеанса: <span class="ticket__details ticket__start">${ticketDetails.seanceTime} - ${ticketDetails.seanceDay}</span></p>
-    <div id="qrcode" class="ticket__info-qr"></div>
-    <p class="ticket__hint">Покажите QR-код нашему контроллеру для подтверждения бронирования.</p>
-    <p class="ticket__hint">Приятного просмотра!</p>
-   `;
-
-  ticketInfoWrapper.insertAdjacentHTML("beforeend", textHtml);
-
-  // QR-код. Функционал находится в файле js/QRCreator.js.
-  // Источник: https://github.com/slesareva-gala/QR-Code
-  const qrText = `
-    Фильм: ${ticketDetails.filmName}
-    Зал: ${ticketDetails.hallNameNumber}
-    Ряд/место: ${ticketDetails.strRowPlace}
-    Дата: ${ticketDetails.seanceDay}
-    Начало сеанса: ${ticketDetails.seanceTime}
-    Билет действителен строго на свой сеанс
-    `;
-
-  const qrcode1 = QRCreator(qrText, {
-    mode: 4,
-    eccl: 0,
-    version: -1,
-    mask: -1,
-    image: "png",
-    modsize: 3,
-    margin: 4,
+  selectSeanse.salesPlaces.forEach((element) => {
+    if (places != "") {
+      places += ", ";
+    }
+    places += `${element.row}/${element.place}`;
+    price +=
+      element.type == "standart"
+        ? Number(selectSeanse.priceStandart)
+        : Number(selectSeanse.priceVip);
   });
 
-  const content = (qrcode) => {
-    return qrcode.error
-      ? `недопустимые исходные данные ${qrcode.error}`
-      : qrcode.result;
-  };
+  document.querySelector(".ticket__title").innerHTML = selectSeanse.filmName; 
+  document.querySelector(".ticket__chairs").innerHTML = places; 
+  document.querySelector(".ticket__hall").innerHTML = selectSeanse.hallName; 
+  document.querySelector(".ticket__start").innerHTML = selectSeanse.seanceTime; 
 
-  document.getElementById("qrcode").append("", content(qrcode1));
-});
+  const date = new Date(Number(`${selectSeanse.seanceTimeStamp}000`));
+  let dd = date.getDate();
+  if (dd < 10) {
+    dd = "0" + dd;
+  }
+  let mm = date.getMonth();
+  if (mm < 10) {
+    mm = "0" + mm;
+  }
+  const dateStr = `${dd}-${mm}-${date.getFullYear()}`;
+
+  let textQR = `Фильм: ${selectSeanse.filmName} Зал: ${
+    selectSeanse.hallName
+  } Ряд/Место ${places} Дата: ${dateStr} Начало сеанса: ${
+    selectSeanse.seanceTime
+  } Билет действителен строго на свой сеанс`;
+
+  const qrcode = QRCreator(textQR, { image: "SVG" });
+  qrcode.download();
+  document.querySelector(".ticket__info-qr").append(qrcode.result);
+  console.log(qrcode.result);
+}
+
+document.addEventListener("DOMContentLoaded", generateTicket);

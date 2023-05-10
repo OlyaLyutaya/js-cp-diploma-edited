@@ -1,50 +1,35 @@
 "use strict";
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Получение актуальной схемы посадочных мест на выбранный сеанс с учетом уже купленных билетов.
-  // В качестве тела POST запроса передайте строку вида event=get_hallConfig&timestamp=${value1}&hallId=${value2}&seanceId=${value3} Где
 
-  // timestamp - начало сеанса с учетом даты Значение указывается в секундах
-  // hallId - ID зала
-  // seanceId - ID сеанса
-
-  // Результат
-  // Строка - html разметка которую следует поместить на странице hall.html внутри контейнера с классом conf-step__wrapper(см разметку
-
-  // Попытка получить данные сеанса...
   const dataOfTheSelectedSeance = getJSON("data-of-the-selected-seance");
-
   const timestamp = +dataOfTheSelectedSeance.seanceTimeStamp / 1000;
   const hallId = dataOfTheSelectedSeance.hallId;
   const seanceId = dataOfTheSelectedSeance.seanceId;
 
-  // Отправим запрос
+ 
   const xhr = new XMLHttpRequest();
   xhr.open("POST", "http://f0769682.xsph.ru/");
   xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
   xhr.send(`event=get_hallConfig&timestamp=${timestamp}&hallId=${hallId}&seanceId=${seanceId}`);
 
-  // Этот код сработает после того, как мы получим ответ сервера
+  
   xhr.onload = function () {
     if (xhr.status != 200) {
-      // HTTP ошибка? Оработаем ошибку
       alert("Ошибка: " + xhr.status);
       return;
     }
 
     console.log(`HALLS - статус запроса: ${xhr.status} (${xhr.statusText})`);
 
-    const response = JSON.parse(xhr.response); // объект
+    const response = JSON.parse(xhr.response); 
 
-    // Евгений Варламов — 20.04.2023 22:01
-    // При get_hallConfig  сервер может возвращать null
-    // Если сервер возвращает  null  это значит что в базе не нашлось ни одного проданного билета на данный сеанс.
-    // И следовательно конфигурацию зала следует брать из массива halls который вы получаете при команде update
+    
     let configSelectedHall;
-    let configHalls = getJSON("config-halls"); // получить и преобразовать из JSON в объект
+    let configHalls = getJSON("config-halls"); 
     if (response !== null) {
       console.info("Есть данные в ответе сервера по залу...");
-      configSelectedHall = response; // приходит один зал  виде строки разметки
+      configSelectedHall = response; 
     } else {
       console.info("В зале нет купленных мест...");
       configSelectedHall = configHalls[hallId];
@@ -71,8 +56,6 @@ document.addEventListener("DOMContentLoaded", () => {
   `;
     buyingInfoSection.insertAdjacentHTML("beforeend", textHtml);
 
-    // Секция со схемой зала
-    // заполняется или из ответа сервера в виде строки-html для выбранного зала, или вытягивается из конфы первого запроса, если нет купленных мест и пришел ответ null
     const confStep = document.querySelector(".conf-step");
     const textHtmlConf = `
     <div class="conf-step__wrapper">
@@ -101,14 +84,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const selectedChairs = [];
 
-    // Клик по месту на схеме зала
     const confStepChair = document.querySelectorAll(
       ".conf-step__wrapper .conf-step__chair"
     );
 
     confStepChair.forEach((element) => {
       element.addEventListener("click", (event) => {
-        // currentTarget — указывает на элемент, на котором установлен обработчик события.
         const elementClickClassList = event.currentTarget.classList;
         if (
           elementClickClassList.contains("conf-step__chair_disabled") ||
@@ -120,15 +101,12 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-    // Клик по кнопке "Забронировать"
+  
     const acceptinButton = document.querySelector(".acceptin-button");
 
     acceptinButton?.addEventListener("click", (event) => {
       event.preventDefault();
-      // 1. Формируем список выбранных мест selectedChairs
-      // 2. Меняем статус выбранных мест с "выбранные" на "занятые"
-      // 3. Сохраняем новую кофигурацию зала ("pre-config-halls") в новом объекте Хранилища
-      // 4. На следующей стринице "после оплаты" - отправляем на сервер измененную схему зала
+      
       const arrayOfRows = Array.from(
         document.querySelectorAll(".conf-step__row")
       );
@@ -159,21 +137,21 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      // Если есть выбранные места в зале
+      
       if (selectedChairs.length) {
-        // Запишем в хранилище выбранные места в зале
+       
         setJSON("data-of-the-selected-chairs", selectedChairs);
 
-        // Конфигурация (разметка) выбранного зала
+        
         const configSelectedHallHtml = document
           .querySelector(".conf-step__wrapper")
           ?.innerHTML.trim();
 
-        // Запишем выбранные места в конфиг залов в Хранилище
+        
         configHalls[dataOfTheSelectedSeance.hallId] = configSelectedHallHtml;
         setJSON("config-halls", configHalls);
 
-        // Подготовим пре-конфигурацию залов с "занятыми" (оплаченными) местами
+        
         confStepChair.forEach((element) => {
           element.classList.replace("conf-step__chair_selected", "conf-step__chair_taken");
         });
@@ -181,14 +159,14 @@ document.addEventListener("DOMContentLoaded", () => {
         const configSelectedHallTaken = document.querySelector(".conf-step__wrapper")?.innerHTML.trim();
         const configHallsTaken = getJSON("config-halls");
 
-        // Запишем занятые места в отдельный пре-конфиг залов в Хранилище, после оплаты он отправится на сервер (отдельный, чтобы при нажатии кнопки "Назад" не показываались места "taken", т.к. они еще не оплачены)
+        
         configHallsTaken[dataOfTheSelectedSeance.hallId] = configSelectedHallTaken;
         setJSON("pre-config-halls-paid-seats", configHallsTaken);
 
-        // Сформируем набор итоговых данных для заполнения билета на следующих страницах
+        
         const dataOfTheSelectedChairs = getJSON("data-of-the-selected-chairs");
 
-        // Считаем общую стоимость билетов и формируем строку выбранных мест
+        
         const arrRowPlace = [];
         let totalCost = 0;
 

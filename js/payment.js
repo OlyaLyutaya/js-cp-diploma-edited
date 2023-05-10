@@ -4,8 +4,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const ticketDetails = getJSON("ticket-details");
 
-  // Наполнение страницы
-  // Секция ticket__info-wrapper
   const ticketInfoWrapper = document.querySelector(".ticket__info-wrapper");
   ticketInfoWrapper.innerHTML = "";
 
@@ -21,37 +19,30 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   ticketInfoWrapper.insertAdjacentHTML("beforeend", textHtml);
 
-  // Клик по кнопке "Получить код бронирования"
+  
   const acceptinButton = document.querySelector(".acceptin-button");
   acceptinButton?.addEventListener("click", (event) => {
-    // Предполагается, что где-то на этом моменте произошла оплата билета
-    // и пора отправить на сервер обновленный конфиг занятых мест в зале
+    
 
-    // В качестве тела POST запроса передайте строку вида event=sale_add&timestamp=${value1}&hallId=${value2}&seanceId=${value3}&hallConfiguration=${value4} Где
-    // timestamp - начало сеанса с учетом даты. Значение указывается в секундах. Подробнее про timestemp можно прочитать тут
-    // hallId - ID зала
-    // seanceId - ID сеанса
-    // hallConfiguration - Строка - html разметка которую следует взять со страницы hall.html внутри контейнера с классом conf-step__wrapper(см разметку).
-
-    const hallsConfigurationObj = getJSON("pre-config-halls-paid-seats"); // из JSON в объект
+    const hallsConfigurationObj = getJSON("pre-config-halls-paid-seats"); 
     const hallConfiguration = hallsConfigurationObj[ticketDetails.hallId];
 
-    // Отправим данные
+    
     const xhr = new XMLHttpRequest();
     xhr.open("POST", "http://f0769682.xsph.ru/");
     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     xhr.send(`event=sale_add&timestamp=${ticketDetails.seanceTimeStampInSec}&hallId=${ticketDetails.hallId}&seanceId=${ticketDetails.seanceId}&hallConfiguration=${hallConfiguration}`);
 
-    // Генерируется периодически во время отправки на сервер
+    
     xhr.upload.onprogress = function (event) {
       console.log(`Отправка данных... Отправлено ${event.loaded} из ${event.total} байт`);
     };
 
     xhr.upload.onerror = function () {
       console.log("Произошла ошибка при загрузке данных на сервер!");
-    }; // --
+    }; 
 
-    // Этот код сработает после того, как мы получим ответ сервера
+    
     xhr.onload = function () {
       console.log(`PAYMENT - статус запроса: ${xhr.status} (${xhr.statusText})`);
       window.location.href = "../ticket.html";
