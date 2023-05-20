@@ -79,14 +79,14 @@ function updateHtmlHall(serverResponse) {
 
   const selectedChairs = [];
 
-  // Клик по месту на схеме зала
+ 
   const confStepChair = document.querySelectorAll(
     ".conf-step__wrapper .conf-step__chair"
   );
 
   confStepChair.forEach((element) => {
     element.addEventListener("click", (event) => {
-      // currentTarget — указывает на элемент, на котором установлен обработчик события.
+     
       const elementClickClassList = event.currentTarget.classList;
       if (
         elementClickClassList.contains("conf-step__chair_disabled") ||
