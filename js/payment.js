@@ -3,7 +3,6 @@
 document.addEventListener("DOMContentLoaded", () => {
 
   const ticketDetails = getJSON("ticket-details");
-
   const ticketInfoWrapper = document.querySelector(".ticket__info-wrapper");
   ticketInfoWrapper.innerHTML = "";
 
@@ -19,33 +18,18 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   ticketInfoWrapper.insertAdjacentHTML("beforeend", textHtml);
 
-  
   const acceptinButton = document.querySelector(".acceptin-button");
   acceptinButton?.addEventListener("click", (event) => {
     
-
     const hallsConfigurationObj = getJSON("pre-config-halls-paid-seats"); 
     const hallConfiguration = hallsConfigurationObj[ticketDetails.hallId];
+    const requestBodyString = `event=sale_add&timestamp=${ticketDetails.seanceTimeStampInSec}&hallId=${ticketDetails.hallId}&seanceId=${ticketDetails.seanceId}&hallConfiguration=${hallConfiguration}`;
 
     
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", "http://f0769682.xsph.ru/");
-    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-    xhr.send(`event=sale_add&timestamp=${ticketDetails.seanceTimeStampInSec}&hallId=${ticketDetails.hallId}&seanceId=${ticketDetails.seanceId}&hallConfiguration=${hallConfiguration}`);
-
-    
-    xhr.upload.onprogress = function (event) {
-      console.log(`Отправка данных... Отправлено ${event.loaded} из ${event.total} байт`);
-    };
-
-    xhr.upload.onerror = function () {
-      console.log("Произошла ошибка при загрузке данных на сервер!");
-    }; 
-
-    
-    xhr.onload = function () {
-      console.log(`PAYMENT - статус запроса: ${xhr.status} (${xhr.statusText})`);
-      window.location.href = "../ticket.html";
-    };
+    createRequest(requestBodyString, "PAYMENT", updateHtmlPayment, true);
   });
+
+  function updateHtmlPayment(serverResponse) {
+    window.location.href = "ticket.html";
+  }
 });
