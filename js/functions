@@ -26,3 +26,4 @@ function createRequest(requestBodyString, requestSourceString = "", callback, up
     console.log(`${requestSourceString} - статус запроса: ${xhr.status} (${xhr.statusText})`);
     callback(xhr.response);
  };
+}
