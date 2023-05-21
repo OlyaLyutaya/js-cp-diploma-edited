@@ -11,7 +11,6 @@ html {
 }
 
 body {
-  min-width: 320px;
   background-image: url("../i/background.jpg");
   background-size: cover;
   background-attachment: fixed;
@@ -33,6 +32,7 @@ body {
   font-weight: 100;
 }
 
+/* ~~~~~~~~~~~~ Главная ~~~~~~~~~~~~ */
 .page-nav {
   position: sticky;
   top: 2px;
@@ -98,14 +98,16 @@ body {
   background: rgba(241, 235, 230, 0.95);
   color: #000000;
 }
-.movie .movie__info {
+/*.movie .movie__info {
   display: flex;
 }
+*/
 .movie .movie__poster {
   position: relative;
   width: 12.5rem;
   height: 17.5rem;
-  
+  /*    left: 1.5rem;
+      top: -1.5rem;*/
 }
 .movie .movie__poster .movie__poster-image {
   position: relative;
@@ -170,6 +172,8 @@ body {
   font-size: 1.5rem;
 }
 
+
+/* ~~~~~~~~~~~~ Кинозал ~~~~~~~~~~~~ */
 .acceptin-button {
   display: block;
   margin: 3rem auto 0;
@@ -182,7 +186,6 @@ body {
   font-size: 1.4rem;
   background-color: #16A6AF;
   color: #FFFFFF;
-  cursor: pointer;
 }
 
 .buying {
@@ -233,14 +236,8 @@ body {
 .conf-step {
   text-align: center;
   background-color: #171D24;
-  padding: 1.5rem 3rem 1.5rem;
-}
-
-@media (max-width: 344px) {
-  .conf-step {
-    padding-left: 0;
-    padding-right: 0;
-  }
+  /* padding: 1.5rem 3rem 1.5rem;
+  */
 }
 
 .conf-step__wrapper {
@@ -304,21 +301,21 @@ body {
   flex-wrap: nowrap;
   text-align: left;
 }
-.conf-step__legend .col {
+.conf-step__legend .column {
   max-width: 25rem;
 }
-.conf-step__legend .col:first-of-type {
+.conf-step__legend .column:first-of-type {
   padding-right: 1.5rem;
   margin-left: auto;
 }
-.conf-step__legend .col:last-of-type {
+.conf-step__legend .column:last-of-type {
   margin-right: auto;
 }
 .conf-step__legend .conf-step__legend-price + .conf-step__legend-price {
   margin-top: 1rem;
 }
 
-
+/* ~~~~~~~~~~~~ Билет ~~~~~~~~~~~~ */
 .tichet__check, .ticket__info-wrapper {
   padding-left: 1.5rem;
   padding-right: 1.5rem;
@@ -411,10 +408,12 @@ body {
 }
 
 .ticket__info-qr {
-  display: block;
+  display: flex;
+  flex-grow: 1;
   margin: 3rem auto 0;
   width: 20rem;
   height: 20rem;
+  text-align: center;
 }
 
 @media screen and (min-width: 479px) {
@@ -422,6 +421,31 @@ body {
     padding: 1rem 2rem;
   }
 }
+
+@media (max-width: 575px) {
+  .movie .movie__info {
+    display: block;
+  }
+
+  .movie .movie__data {
+    margin-bottom: 2rem;
+  }
+
+  .conf-step {
+    padding: 1.5rem 1rem 1.5rem;
+  }
+}
+
+@media (min-width: 576px) {
+  .movie .movie__info {
+    display: flex;
+  }
+
+  .conf-step {
+    padding: 1.5rem 3rem 1.5rem;
+  }
+}
+
 @media screen and (min-width: 990px) {
   .page-header, nav, main {
     width: 990px;
@@ -437,28 +461,15 @@ body {
   }
 }
 
- #qrcode > * {
-  width: 100%
+/*================================================================*/
+
+.movie .movie-seances__hall .acceptin-button-disabled {
+ background-color: #888888;
+ pointer-events: none
+}
+
+.acceptin-button:disabled {
+  background-color: #888888;
+  pointer-events: none
  }
 
- @media screen and (max-width: 425px) {
-   .movie .movie__info {
-     flex-direction: column;
-   }
-
-   .movie .movie__description {
-     padding-left: 0;
-     margin-bottom: 3rem;
-   }
-
-   .movie .movie__poster {
-     height: auto;
-     width: 50%;
-     margin: auto;
-   }
-
-   .movie .movie__poster .movie__poster-image {
-     height: auto;
-     width: 100%;
-   }
- }
